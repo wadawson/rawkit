@@ -6,6 +6,10 @@ The :class:`libraw.bindings` module handles linking against the LibRaw binary.
 
 from ctypes import *  # noqa
 from ctypes import util
+import os.environ
+import os.path
+import sys
+import platform
 
 from libraw import errors
 from libraw.callbacks import data_callback
@@ -28,14 +32,21 @@ class LibRaw(CDLL):
     """
 
     def __init__(self):  # pragma: no cover
-        libraw = util.find_library('raw')
+        # A hack modified from https://github.com/Atanahel/conda-rawkit/blob/master/patch_binding.patch
+        # See https://github.com/photoshell/rawkit/issues/116
+        # and https://github.com/photoshell/rawkit/issues/119
+        shared_lib_ext = {'Linux':'.so', 'Darwin':'.dylib', 'Windows':'.dll'}
+        libraw = os.path.join(os.environ['LD_LIBRARY_PATH'], 
+                              'libraw' + shared_lib_ext[platform.system()])
+        if not os.path.exists(libraw)
+            libraw = util.find_library('raw')
         try:
             if libraw is not None:
                 super(LibRaw, self).__init__(libraw)
             else:
                 raise ImportError
         except (ImportError, AttributeError, OSError, IOError):
-            raise ImportError('Cannot find LibRaw on your system!')
+            raise ImportError('Cannot find LibRaw on your system! Please verify that it is installed and the LD_LIBRARY_PATH is set to its installation directory, e.g. LD_LIBRARY_PATH="$HOME/local/lib".')
 
         try:
             structs = {
@@ -152,7 +163,7 @@ class LibRaw(CDLL):
             libraw_processed_image_t)
         self.libraw_raw2image.restype = c_error
         self.libraw_get_decoder_info.restype = c_error
-        self.libraw_COLOR.restype = c_int
+        self.libraw_COLOR.restype = c_error
 
         # Some special Windows-only garbage:
 
