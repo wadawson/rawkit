@@ -6,7 +6,7 @@ The :class:`libraw.bindings` module handles linking against the LibRaw binary.
 
 from ctypes import *  # noqa
 from ctypes import util
-import os.environ
+import os
 import os.path
 import sys
 import platform
