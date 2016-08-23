@@ -38,7 +38,7 @@ class LibRaw(CDLL):
         shared_lib_ext = {'Linux':'.so', 'Darwin':'.dylib', 'Windows':'.dll'}
         libraw = os.path.join(os.environ['LD_LIBRARY_PATH'], 
                               'libraw' + shared_lib_ext[platform.system()])
-        if not os.path.exists(libraw)
+        if not os.path.exists(libraw):
             libraw = util.find_library('raw')
         try:
             if libraw is not None:
